@@ -16,11 +16,9 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.4
 
-  - type: web
+  - type: static
     name: kale-frontend
-    runtime: static
     rootDir: frontend
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
