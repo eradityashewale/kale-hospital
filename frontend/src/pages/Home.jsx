@@ -8,18 +8,58 @@ import { useReveal } from '../hooks/useReveal.js';
 import { useCountUp } from '../hooks/useCountUp.js';
 
 const SERVICES = [
-  { icon: '🔪', title: 'General & Laparoscopic Surgery', desc: 'Minimally invasive and open surgical procedures for a wide range of conditions.' },
-  { icon: '🦴', title: 'Orthopedic & Joint Care', desc: 'Fracture care, joint replacement, and sports injury management.' },
-  { icon: '👶', title: 'Gynecology & Obstetrics', desc: 'Comprehensive women’s health, prenatal care, and safe delivery services.' },
-  { icon: '👂', title: 'ENT Surgery', desc: 'Ear, nose, and throat diagnostics and surgical treatment.' },
-  { icon: '🩺', title: 'Urology & Kidney Care', desc: 'Diagnosis and surgical management of urological conditions.' },
-  { icon: '🚑', title: 'Emergency & Trauma Care', desc: '24x7 emergency response with a dedicated trauma team.' },
-  { icon: '❤️', title: 'ICU & Critical Care', desc: 'Round-the-clock monitoring for critical and post-operative patients.' },
-  { icon: '🧪', title: 'Diagnostics & Pathology Lab', desc: 'In-house lab and imaging for fast, accurate diagnosis.' },
+  {
+    icon: '🔪',
+    title: 'Suture & Sutureless Surgery',
+    desc: 'All types of surgical procedures, performed with traditional stitches or advanced stitchless, minimally invasive techniques.',
+    detail: 'We perform a wide range of general surgical procedures using both conventional (open, stitched) techniques and modern stitchless methods. Sutureless approaches use surgical glue, staples, or laser-assisted closure to reduce scarring, minimize pain, and speed up healing — ideal for smaller wounds, minor lumps, and skin-level procedures.',
+  },
+  {
+    icon: '🔬',
+    title: 'Laparoscopic Hernia & Abdominal Surgery',
+    desc: 'Examination and treatment of hernia and internal abdominal organs using laparoscope (keyhole surgery) for faster recovery and minimal scarring.',
+    detail: 'Using a laparoscope — a thin camera inserted through a few small incisions — our surgeons examine and treat hernias and internal abdominal organs without large open cuts. This keyhole approach means smaller scars, less post-operative pain, shorter hospital stays, and a quicker return to daily activities compared to traditional open surgery.',
+  },
+  {
+    icon: '💎',
+    title: 'Gallstone, Bladder Stone & Lump Treatment',
+    desc: 'Diagnosis and treatment of gallbladder stones, urinary bladder stones, ulcers, piles (hemorrhoids), breast lumps, and other internal or external body lumps.',
+    detail: 'We diagnose and surgically treat gallbladder stones (cholelithiasis), urinary bladder stones, stomach ulcers, piles (hemorrhoids), and lumps in the breast or elsewhere in the body. Depending on severity, treatment ranges from medication and minimally invasive stone removal to surgical excision of lumps and affected tissue.',
+  },
+  {
+    icon: '🚨',
+    title: 'Hernia, Appendix & Emergency Abdominal Surgery',
+    desc: 'Emergency surgical care for hernia, appendicitis, hydrocele, intestinal blockage, and intestinal perforation.',
+    detail: 'Round-the-clock emergency surgical care for acute conditions including hernia, appendicitis, hydrocele, intestinal blockage (obstruction), and intestinal perforation. These conditions often require urgent surgery to prevent complications, and our team is equipped to operate immediately when needed.',
+  },
+  {
+    icon: '🎗️',
+    title: 'Cancer Diagnosis & Treatment',
+    desc: 'Screening, diagnosis, and surgical treatment for cancer.',
+    detail: 'Our team provides screening and diagnostic evaluation for suspected cancers, along with surgical treatment options where indicated. Early detection and prompt surgical intervention significantly improve outcomes, and we guide patients through the journey from diagnosis to treatment.',
+  },
+  {
+    icon: '🔥',
+    title: 'Burn Patient Care',
+    desc: 'Specialized treatment and wound management for burn injury patients.',
+    detail: 'Specialized wound care and treatment for patients with burn injuries — including cleaning, dressing, and infection prevention — along with surgical management of severe burns where skin grafting or reconstructive care is required.',
+  },
+  {
+    icon: '🦶',
+    title: 'Diabetic Foot Care',
+    desc: 'Dedicated care, wound management, and treatment for diabetic foot complications.',
+    detail: 'Diabetic patients are prone to foot ulcers, infections, and poor wound healing due to reduced circulation and nerve sensitivity. We offer dedicated wound management, infection control, and, when necessary, surgical intervention to prevent complications and preserve mobility.',
+  },
+  {
+    icon: '🚑',
+    title: 'Trauma & Emergency Services',
+    desc: '24x7 trauma care and emergency medical services for critical situations.',
+    detail: '24x7 emergency response for accident injuries and critical trauma cases, with a dedicated team ready to stabilize and treat patients around the clock — from initial assessment through emergency surgery if required.',
+  },
 ];
 
 const DOCTORS = [
-  { name: 'Dr. A. Kale', role: 'Chief Surgeon · General & Laparoscopic Surgery', photo: 'doctor-1.jpg' },
+  { name: 'Dr. Bhushan Kale', role: 'Chief Surgeon · General & Laparoscopic Surgery', photo: 'doctor-1.jpg' },
   { name: 'Dr. S. Rao', role: 'Orthopedic Surgeon', photo: 'doctor-2.jpg' },
   { name: 'Dr. P. Nair', role: 'Gynecologist & Obstetrician', photo: 'doctor-3.jpg' },
   { name: 'Dr. M. Iyer', role: 'Anesthesiology & Critical Care', photo: 'doctor-4.jpg' },
@@ -57,6 +97,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [statsRef, statsVisible] = useReveal({ threshold: 0.4 });
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [activeService, setActiveService] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -72,6 +113,15 @@ export default function Home() {
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
   const showPrev = useCallback((e) => { e?.stopPropagation(); setLightboxIndex((i) => (i - 1 + GALLERY.length) % GALLERY.length); }, []);
   const showNext = useCallback((e) => { e?.stopPropagation(); setLightboxIndex((i) => (i + 1) % GALLERY.length); }, []);
+
+  const closeServiceDetail = useCallback(() => setActiveService(null), []);
+
+  useEffect(() => {
+    if (activeService === null) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') closeServiceDetail(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeService, closeServiceDetail]);
 
   useEffect(() => {
     if (lightboxIndex === null) return undefined;
@@ -159,11 +209,17 @@ export default function Home() {
         </Reveal>
         <Reveal className="public-grid cols-4" stagger>
           {SERVICES.map((s) => (
-            <article className="service-card" key={s.title}>
+            <button
+              type="button"
+              className="service-card service-card-btn"
+              key={s.title}
+              onClick={() => setActiveService(s)}
+            >
               <span className="service-icon" aria-hidden="true">{s.icon}</span>
               <strong>{s.title}</strong>
               <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{s.desc}</p>
-            </article>
+              <span className="service-card-more">Learn more →</span>
+            </button>
           ))}
         </Reveal>
       </section>
@@ -246,6 +302,20 @@ export default function Home() {
           <a onClick={() => navigate('/login')}>Staff Login</a>
         </div>
       </footer>
+
+      {activeService && (
+        <div className="service-modal-overlay" onClick={closeServiceDetail}>
+          <div className="service-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+            <button className="service-modal-close" type="button" onClick={closeServiceDetail} aria-label="Close">✕</button>
+            <span className="service-modal-icon" aria-hidden="true">{activeService.icon}</span>
+            <h3 id="service-modal-title">{activeService.title}</h3>
+            <p>{activeService.detail}</p>
+            <div className="service-modal-cta">
+              <button className="primary-btn" type="button" onClick={() => { closeServiceDetail(); scrollTo('contact'); }}>Book an appointment</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {lightboxIndex !== null && (
         <div className="lightbox-overlay" onClick={closeLightbox}>
