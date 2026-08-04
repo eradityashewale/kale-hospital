@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
 
 from . import models
 from .config import CORS_ORIGINS
@@ -32,12 +33,16 @@ Base.metadata.create_all(bind=engine)
 
 
 def _migrate_schema() -> None:
-    # SQLite + no Alembic here: create_all only adds missing tables, not missing
-    # columns on tables that already existed before a model change.
-    with engine.connect() as conn:
-        cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(attendance)")]
-        if cols and "shift" not in cols:
-            conn.exec_driver_sql("ALTER TABLE attendance ADD COLUMN shift TEXT DEFAULT ''")
+    # No Alembic here: create_all only adds missing tables, not missing
+    # columns on tables that already existed before a model change. Uses the
+    # SQLAlchemy inspector so this works on both SQLite and Postgres.
+    inspector = inspect(engine)
+    if "attendance" not in inspector.get_table_names():
+        return
+    cols = [col["name"] for col in inspector.get_columns("attendance")]
+    if "shift" not in cols:
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE attendance ADD COLUMN shift VARCHAR DEFAULT ''"))
             conn.commit()
 
 
