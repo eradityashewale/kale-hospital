@@ -24,7 +24,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE
-        value: https://kale-backend-g6s8.onrender.com
+        value: https://kale-backend-g6s8.onrender.com/api
     routes:
       - type: rewrite
         source: /*
