@@ -18,9 +18,9 @@ import Laboratory from './pages/Laboratory.jsx';
 import Radiology from './pages/Radiology.jsx';
 import Billing from './pages/Billing.jsx';
 import Insurance from './pages/Insurance.jsx';
+import Expenses from './pages/Expenses.jsx';
 import Departments from './pages/Departments.jsx';
 import Staff from './pages/Staff.jsx';
-import Branches from './pages/Branches.jsx';
 import Users from './pages/Users.jsx';
 import Roles from './pages/Roles.jsx';
 import HospitalSettings from './pages/HospitalSettings.jsx';
@@ -29,6 +29,7 @@ import Reports from './pages/Reports.jsx';
 import AuditLogs from './pages/AuditLogs.jsx';
 import Backup from './pages/Backup.jsx';
 import Notifications from './pages/Notifications.jsx';
+import Leave from './pages/Leave.jsx';
 import Profile from './pages/Profile.jsx';
 
 export default function App() {
@@ -54,9 +55,9 @@ export default function App() {
             <Route path="/radiology" element={<Radiology />} />
             <Route path="/billing" element={<Billing />} />
             <Route path="/insurance" element={<Insurance />} />
+            <Route path="/expenses" element={<Expenses />} />
             <Route path="/departments" element={<Departments />} />
             <Route path="/staff" element={<Staff />} />
-            <Route path="/branches" element={<Branches />} />
             <Route path="/users" element={<Users />} />
             <Route path="/roles" element={<Roles />} />
             <Route path="/hospital-settings" element={<HospitalSettings />} />
@@ -65,6 +66,7 @@ export default function App() {
             <Route path="/audit-logs" element={<AuditLogs />} />
             <Route path="/backup" element={<Backup />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/leave" element={<Leave />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>

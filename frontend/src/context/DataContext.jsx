@@ -5,10 +5,10 @@ import { useAuth } from './AuthContext.jsx';
 const DataContext = createContext(null);
 
 const EMPTY = {
-  departments: [], doctors: [], nurses: [], receptionists: [], labTechnicians: [], pharmacists: [], branches: [],
+  departments: [], doctors: [], nurses: [], receptionists: [], labTechnicians: [], pharmacists: [],
   patients: [], appointments: [], opdVisits: [], ipdAdmissions: [], bedBuildings: [], medicines: [], labTests: [],
-  radiologyTests: [], bills: [], insuranceClaims: [], emergencyCases: [], attendanceRecords: [], notifications: [],
-  backupHistory: [], rolePermissions: {}, users: [], auditLogs: [],
+  radiologyTests: [], bills: [], insuranceClaims: [], emergencyCases: [], attendanceRecords: [], leaveRequests: [], leaveBalances: [], notifications: [],
+  backupHistory: [], rolePermissions: {}, users: [], auditLogs: [], expenses: [],
 };
 
 export function DataProvider({ children }) {

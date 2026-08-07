@@ -106,6 +106,33 @@ def attendance_dict(a: models.Attendance) -> dict:
     return {"id": a.id, "staff": a.staff, "role": a.role, "date": a.date, "shift": a.shift, "status": a.status, "checkIn": a.check_in, "checkOut": a.check_out}
 
 
+def leave_dict(l: models.LeaveRequest) -> dict:
+    return {
+        "id": l.id, "userId": l.user_id, "requesterName": l.requester_name, "role": l.role,
+        "leaveType": l.leave_type, "startDate": l.start_date, "endDate": l.end_date, "reason": l.reason,
+        "status": l.status, "appliedAt": l.applied_at, "reviewedBy": l.reviewed_by,
+        "reviewedAt": l.reviewed_at, "reviewNote": l.review_note,
+    }
+
+
+LEAVE_TYPES = ("Sick", "Casual", "Paid", "Unpaid")
+DEFAULT_LEAVE_ALLOCATIONS = {"Sick": 5, "Casual": 3, "Paid": 2, "Unpaid": 1}
+
+
+def leave_balance_dict_for(db, user: models.User, leave_type: str) -> dict:
+    b = (
+        db.query(models.LeaveBalance)
+        .filter(models.LeaveBalance.user_id == user.id, models.LeaveBalance.leave_type == leave_type)
+        .first()
+    )
+    allocated = b.allocated if b else DEFAULT_LEAVE_ALLOCATIONS[leave_type]
+    used = b.used if b else 0
+    return {
+        "id": b.id if b else None, "userId": user.id, "name": user.name, "role": user.role,
+        "leaveType": leave_type, "allocated": allocated, "used": used, "remaining": allocated - used,
+    }
+
+
 def notification_dict(n: models.Notification) -> dict:
     return {"id": n.id, "type": n.type, "message": n.message, "recipient": n.recipient, "status": n.status, "time": n.time, "read": n.read}
 
@@ -116,6 +143,13 @@ def audit_dict(a: models.AuditLog) -> dict:
 
 def backup_dict(b: models.BackupRecord) -> dict:
     return {"id": b.id, "date": b.date, "size": b.size, "status": b.status}
+
+
+def expense_dict(e: models.Expense) -> dict:
+    return {
+        "id": e.id, "category": e.category, "description": e.description,
+        "amount": e.amount, "date": e.date, "recordedBy": e.recorded_by,
+    }
 
 
 def department_dict(db: Session, d: models.Department) -> dict:
@@ -143,10 +177,6 @@ def lab_tech_dict(t: models.LabTechnician) -> dict:
 
 def pharmacist_dict(p: models.Pharmacist) -> dict:
     return {"id": p.id, "name": p.name, "dept": p.dept, "shift": p.shift, "status": p.status, "phone": p.phone}
-
-
-def branch_dict(b: models.Branch) -> dict:
-    return {"id": b.id, "name": b.name, "location": b.location, "beds": b.beds, "staff": b.staff, "status": b.status}
 
 
 def user_dict(u: models.User) -> dict:

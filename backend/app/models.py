@@ -84,16 +84,6 @@ class Pharmacist(Base):
     phone = Column(String, default="")
 
 
-class Branch(Base):
-    __tablename__ = "branches"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    location = Column(String, default="")
-    beds = Column(Integer, default=0)
-    staff = Column(Integer, default=0)
-    status = Column(String, default="Active")
-
-
 class Patient(Base):
     __tablename__ = "patients"
     id = Column(String, primary_key=True)
@@ -311,6 +301,34 @@ class Attendance(Base):
     check_out = Column(String, default="")
 
 
+class LeaveRequest(Base):
+    __tablename__ = "leave_requests"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    requester_name = Column(String, default="")
+    role = Column(String, default="")
+    leave_type = Column(String, nullable=False)
+    start_date = Column(String, default="")
+    end_date = Column(String, default="")
+    reason = Column(Text, default="")
+    status = Column(String, default="Pending")
+    applied_at = Column(String, default="")
+    reviewed_by = Column(String, nullable=True)
+    reviewed_at = Column(String, nullable=True)
+    review_note = Column(Text, nullable=True)
+
+
+class LeaveBalance(Base):
+    __tablename__ = "leave_balances"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    leave_type = Column(String, nullable=False)
+    allocated = Column(Integer, default=0)
+    used = Column(Integer, default=0)
+
+    __table_args__ = (UniqueConstraint("user_id", "leave_type", name="uq_user_leave_type"),)
+
+
 class Notification(Base):
     __tablename__ = "notifications"
     id = Column(String, primary_key=True)
@@ -352,3 +370,13 @@ class BackupRecord(Base):
     date = Column(String, default="")
     size = Column(String, default="")
     status = Column(String, default="Completed")
+
+
+class Expense(Base):
+    __tablename__ = "expenses"
+    id = Column(String, primary_key=True)
+    category = Column(String, nullable=False)
+    description = Column(Text, default="")
+    amount = Column(Float, nullable=False)
+    date = Column(String, default="")
+    recorded_by = Column(String, default="")

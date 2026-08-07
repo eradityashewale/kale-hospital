@@ -15,11 +15,12 @@ from .routers import (
     beds,
     billing,
     bootstrap,
-    branches,
     departments,
     emergency,
+    expenses,
     ipd,
     lab_radiology,
+    leave,
     notifications,
     opd,
     patients,
@@ -76,7 +77,7 @@ def health():
 for router in (
     auth.router, bootstrap.router, patients.router, appointments.router, opd.router, ipd.router,
     beds.router, pharmacy.router, lab_radiology.router, billing.router, emergency.router,
-    departments.router, staff.router, branches.router, users.router, roles.router,
+    departments.router, staff.router, leave.router, expenses.router, users.router, roles.router,
     notifications.router, audit_logs.router, backup.router,
 ):
     app.include_router(router)

@@ -18,7 +18,6 @@ def bootstrap(user: models.User = Depends(get_current_user), db: Session = Depen
         "receptionists": [serializers.receptionist_dict(r) for r in db.query(models.Receptionist).all()],
         "labTechnicians": [serializers.lab_tech_dict(t) for t in db.query(models.LabTechnician).all()],
         "pharmacists": [serializers.pharmacist_dict(p) for p in db.query(models.Pharmacist).all()],
-        "branches": [serializers.branch_dict(b) for b in db.query(models.Branch).all()],
         "patients": [serializers.patient_full_dict(db, p) for p in patients],
         "appointments": [serializers.appointment_dict(a) for a in db.query(models.Appointment).order_by(models.Appointment.id.desc()).all()],
         "opdVisits": [serializers.opd_dict(v) for v in db.query(models.OpdVisit).order_by(models.OpdVisit.id.desc()).all()],
@@ -35,6 +34,24 @@ def bootstrap(user: models.User = Depends(get_current_user), db: Session = Depen
         "backupHistory": [serializers.backup_dict(b) for b in db.query(models.BackupRecord).order_by(models.BackupRecord.id.desc()).all()],
         "rolePermissions": serializers.role_permissions_dict(db.query(models.RolePermission).all()),
     }
+    if user.role in ("Super Admin", "Admin"):
+        leave_query = db.query(models.LeaveRequest)
+    else:
+        leave_query = db.query(models.LeaveRequest).filter(models.LeaveRequest.user_id == user.id)
+    data["leaveRequests"] = [serializers.leave_dict(l) for l in leave_query.order_by(models.LeaveRequest.applied_at.desc()).all()]
+    if user.role in ("Super Admin", "Admin"):
+        data["leaveBalances"] = [
+            serializers.leave_balance_dict_for(db, u, lt)
+            for u in db.query(models.User).filter(~models.User.role.in_(("Super Admin", "Admin"))).all()
+            for lt in serializers.LEAVE_TYPES
+        ]
+    else:
+        data["leaveBalances"] = [serializers.leave_balance_dict_for(db, user, lt) for lt in serializers.LEAVE_TYPES]
+    if user.role in ("Super Admin", "Admin"):
+        data["expenses"] = [
+            serializers.expense_dict(e)
+            for e in db.query(models.Expense).order_by(models.Expense.date.desc(), models.Expense.id.desc()).all()
+        ]
     if user.role == "Super Admin":
         data["users"] = [serializers.user_dict(u) for u in db.query(models.User).all()]
         data["auditLogs"] = [serializers.audit_dict(a) for a in db.query(models.AuditLog).order_by(models.AuditLog.id.desc()).all()]

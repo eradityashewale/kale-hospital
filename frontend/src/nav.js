@@ -16,9 +16,9 @@ export const navigation = [
   { id: 'radiology', label: 'Radiology', icon: '🩻', group: 'Operations', roles: ['Super Admin', 'Admin', 'Doctor'] },
   { id: 'billing', label: 'Billing', icon: '💳', group: 'Operations', roles: ['Super Admin', 'Admin', 'Receptionist'] },
   { id: 'insurance', label: 'Insurance', icon: '🛡', group: 'Operations', roles: ['Super Admin', 'Admin', 'Receptionist'] },
+  { id: 'expenses', label: 'Expenses', icon: '💰', group: 'Operations', roles: ['Super Admin', 'Admin'] },
   { id: 'departments', label: 'Departments', icon: '🏬', group: 'Administration', roles: ['Super Admin', 'Admin'] },
   { id: 'staff', label: 'Staff Management', icon: '👥', group: 'Administration', roles: ['Super Admin', 'Admin'] },
-  { id: 'branches', label: 'Branch Management', icon: '🏥', group: 'Administration', roles: ['Super Admin'] },
   { id: 'users', label: 'User Management', icon: '🔑', group: 'Administration', roles: ['Super Admin'] },
   { id: 'roles', label: 'Roles & Permissions', icon: '🔐', group: 'Administration', roles: ['Super Admin'] },
   { id: 'hospital-settings', label: 'Hospital Settings', icon: '⚙', group: 'Administration', roles: ['Super Admin'] },
@@ -27,6 +27,7 @@ export const navigation = [
   { id: 'audit-logs', label: 'Audit Logs', icon: '🕵', group: 'Insights', roles: ['Super Admin'] },
   { id: 'backup', label: 'Backup & Restore', icon: '💾', group: 'Insights', roles: ['Super Admin'] },
   { id: 'notifications', label: 'Notification Center', icon: '🔔', group: 'Insights', roles: ['Super Admin', 'Admin'] },
+  { id: 'leave', label: 'Leave', icon: '🌴', group: 'Account', roles: ALL_ROLES },
   { id: 'profile', label: 'Profile', icon: '🧾', group: 'Account', roles: ALL_ROLES },
 ];
 

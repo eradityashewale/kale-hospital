@@ -61,13 +61,6 @@ def seed_if_empty(db: Session) -> None:
     db.add(models.LabTechnician(id="LAB-T1", name="Vikram Sethi", dept="Pathology", shift="Morning", status="On Duty", phone="+91 95000 44001"))
     db.add(models.Pharmacist(id="PHM-1", name="Divya Kapoor", dept="Pharmacy", shift="Morning", status="On Duty", phone="+91 94000 55001"))
 
-    branches = [
-        models.Branch(id="BR-1", name="Kale Hospital Central", location="MG Road, Bengaluru", beds=180, staff=240, status="Active"),
-        models.Branch(id="BR-2", name="Kale Hospital North", location="Hebbal, Bengaluru", beds=90, staff=120, status="Active"),
-        models.Branch(id="BR-3", name="Kale Hospital Coastal", location="Panaji, Goa", beds=60, staff=75, status="Under Renovation"),
-    ]
-    db.add_all(branches)
-
     patients_data = [
         dict(id="PAT-1001", name="Aisha Khan", gender="Female", dob="1991-04-12", mobile="+91 90111 22001", alt_mobile="", email="aisha.khan@mail.com",
              address="221B Lakeview Road, Bengaluru", blood_group="O+", aadhaar="•••• •••• 4432", emergency_contact="Imran Khan (+91 90111 90001)",

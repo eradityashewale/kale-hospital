@@ -39,6 +39,7 @@ def mark_read(notification_id: str, user: models.User = Depends(get_current_user
         raise HTTPException(status_code=404, detail="Notification not found")
     notif.read = True
     db.commit()
+    log_audit(db, user.name, f"Marked notification {notif.id} as read", "Notifications")
     return notification_dict(notif)
 
 
@@ -46,4 +47,5 @@ def mark_read(notification_id: str, user: models.User = Depends(get_current_user
 def mark_all_read(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     db.query(models.Notification).update({models.Notification.read: True})
     db.commit()
+    log_audit(db, user.name, "Marked all notifications as read", "Notifications")
     return {"ok": True}
