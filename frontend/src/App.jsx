@@ -14,6 +14,7 @@ import Vitals from './pages/Vitals.jsx';
 import Prescriptions from './pages/Prescriptions.jsx';
 import Beds from './pages/Beds.jsx';
 import Pharmacy from './pages/Pharmacy.jsx';
+import Vendors from './pages/Vendors.jsx';
 import Laboratory from './pages/Laboratory.jsx';
 import Radiology from './pages/Radiology.jsx';
 import Billing from './pages/Billing.jsx';
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/prescriptions" element={<Prescriptions />} />
             <Route path="/beds" element={<Beds />} />
             <Route path="/pharmacy" element={<Pharmacy />} />
+            <Route path="/vendors" element={<Vendors />} />
             <Route path="/laboratory" element={<Laboratory />} />
             <Route path="/radiology" element={<Radiology />} />
             <Route path="/billing" element={<Billing />} />

@@ -29,6 +29,14 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const result = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    if (result.requiresTwoFactor) return result;
+    setToken(result.token);
+    setUser(result.user);
+    return result.user;
+  }, []);
+
+  const loginWithTwoFactor = useCallback(async (challengeToken, code) => {
+    const result = await apiFetch('/auth/login/2fa', { method: 'POST', body: JSON.stringify({ challengeToken, code }) });
     setToken(result.token);
     setUser(result.user);
     return result.user;
@@ -43,7 +51,7 @@ export function AuthProvider({ children }) {
   const updateUser = useCallback((next) => setUser(next), []);
 
   return (
-    <AuthContext.Provider value={{ user, initializing, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, initializing, login, loginWithTwoFactor, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

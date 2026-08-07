@@ -9,6 +9,24 @@ def _split(text):
     return [item.strip() for item in (text or "").split(",") if item.strip()]
 
 
+SETTINGS_DEFAULTS = {
+    "hospital": {
+        "hospitalName": "Kale Hospital Multi-specialty Hospital", "regNo": "KA-HMS-88213",
+        "timezone": "Asia/Kolkata", "currency": "INR (₹)", "language": "English",
+    },
+    "opd": {"opdFee": 500, "tokenReset": "06:00", "maxTokens": 40},
+    "ipd": {"generalRate": 1500, "icuRate": 6000, "dischargeApproval": "Yes"},
+}
+
+
+def settings_group_dict(db: Session, group: str) -> dict:
+    defaults = SETTINGS_DEFAULTS.get(group, {})
+    row = db.query(models.Setting).filter(models.Setting.key == group).first()
+    if not row:
+        return dict(defaults)
+    return {**defaults, **json.loads(row.value)}
+
+
 def patient_summary_dict(p: models.Patient) -> dict:
     vitals = None
     if p.vitals:
@@ -71,6 +89,14 @@ def appointment_dict(a: models.Appointment) -> dict:
     }
 
 
+def referral_dict(r: models.Referral) -> dict:
+    return {
+        "id": r.id, "patientId": r.patient_id, "patient": r.patient_name, "fromDepartment": r.from_department,
+        "toDepartment": r.to_department, "doctor": r.doctor, "reason": r.reason, "status": r.status,
+        "date": r.date, "referredBy": r.referred_by,
+    }
+
+
 def opd_dict(v: models.OpdVisit) -> dict:
     return {
         "id": v.id, "patientId": v.patient_id, "patient": v.patient_name, "doctor": v.doctor, "department": v.department,
@@ -95,7 +121,10 @@ def claim_dict(c: models.InsuranceClaim) -> dict:
 
 
 def medicine_dict(m: models.Medicine) -> dict:
-    return {"id": m.id, "name": m.name, "category": m.category, "stock": m.stock, "unit": m.unit, "expiry": m.expiry, "supplier": m.supplier, "price": m.price}
+    return {
+        "id": m.id, "name": m.name, "category": m.category, "stock": m.stock, "unit": m.unit, "expiry": m.expiry,
+        "supplier": m.supplier, "price": m.price, "reorderLevel": m.reorder_level,
+    }
 
 
 def emergency_dict(e: models.EmergencyCase) -> dict:
@@ -159,6 +188,13 @@ def department_dict(db: Session, d: models.Department) -> dict:
     return {"id": d.id, "name": d.name, "head": d.head, "doctors": doctors_count, "opdToday": opd_today, "ipdToday": ipd_today}
 
 
+def vendor_dict(v: models.Vendor) -> dict:
+    return {
+        "id": v.id, "name": v.name, "category": v.category, "contactPerson": v.contact_person,
+        "phone": v.phone, "email": v.email, "address": v.address, "status": v.status,
+    }
+
+
 def doctor_dict(d: models.Doctor) -> dict:
     return {"id": d.id, "name": d.name, "department": d.department, "specialization": d.specialization, "status": d.status, "experience": d.experience, "phone": d.phone, "email": d.email, "shift": d.shift}
 
@@ -180,7 +216,10 @@ def pharmacist_dict(p: models.Pharmacist) -> dict:
 
 
 def user_dict(u: models.User) -> dict:
-    return {"id": u.id, "name": u.name, "email": u.email, "role": u.role, "phone": u.phone, "department": u.department, "ward": u.ward}
+    return {
+        "id": u.id, "name": u.name, "email": u.email, "role": u.role, "phone": u.phone,
+        "department": u.department, "ward": u.ward, "totpEnabled": bool(u.totp_enabled),
+    }
 
 
 def bed_buildings_dict(buildings: list[models.BedBuilding]) -> list:

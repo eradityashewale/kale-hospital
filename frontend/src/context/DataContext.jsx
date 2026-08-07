@@ -6,9 +6,9 @@ const DataContext = createContext(null);
 
 const EMPTY = {
   departments: [], doctors: [], nurses: [], receptionists: [], labTechnicians: [], pharmacists: [],
-  patients: [], appointments: [], opdVisits: [], ipdAdmissions: [], bedBuildings: [], medicines: [], labTests: [],
+  patients: [], appointments: [], referrals: [], opdVisits: [], ipdAdmissions: [], bedBuildings: [], medicines: [], vendors: [], labTests: [],
   radiologyTests: [], bills: [], insuranceClaims: [], emergencyCases: [], attendanceRecords: [], leaveRequests: [], leaveBalances: [], notifications: [],
-  backupHistory: [], rolePermissions: {}, users: [], auditLogs: [], expenses: [],
+  backupHistory: [], rolePermissions: {}, users: [], auditLogs: [], expenses: [], settings: {},
 };
 
 export function DataProvider({ children }) {

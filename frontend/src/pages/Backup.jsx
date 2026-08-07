@@ -19,9 +19,11 @@ export default function Backup() {
   };
 
   const restore = async (id) => {
+    if (!window.confirm(`Restore from backup ${id}? This will replace all current data with the data from this backup.`)) return;
     try {
       await apiFetch(`/backup/${id}/restore`, { method: 'POST' });
-      showToast(`Restore initiated from ${id}. This may take a few minutes.`, 'info');
+      showToast(`Restored from ${id}. Reloading...`, 'success');
+      window.location.reload();
     } catch (err) {
       showToast(err.message, 'error');
     }
@@ -32,16 +34,15 @@ export default function Backup() {
       <div className="hero-card">
         <div>
           <p className="eyebrow">Super Admin · Data protection</p>
-          <h2>Automatic daily backups keep every record safe.</h2>
+          <h2>Run an on-demand backup of every table, or restore a previous one.</h2>
         </div>
         <button className="primary-btn" type="button" onClick={runBackup}>Run backup now</button>
       </div>
       <article className="card">
-        <div className="card-head"><h3>Backup schedule</h3></div>
+        <div className="card-head"><h3>Backup details</h3></div>
         <div className="list-stack">
-          <div className="item"><span>Daily automatic backup</span><span className="pill good">Enabled · 03:00 daily</span></div>
-          <div className="item"><span>Retention policy</span><span>30 days</span></div>
-          <div className="item"><span>Storage target</span><span>AWS S3 (ap-south-1)</span></div>
+          <div className="item"><span>Backup type</span><span>Full table export (JSON), on-demand</span></div>
+          <div className="item"><span>Storage</span><span>Server-local disk (backend/backups/)</span></div>
         </div>
       </article>
       <DataTable

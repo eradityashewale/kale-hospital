@@ -6,3 +6,4 @@ __pycache__/
 *.mp4
 .env
 kale_pdf_images/
+backups/

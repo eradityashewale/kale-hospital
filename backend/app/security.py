@@ -22,5 +22,11 @@ def create_access_token(user_id: str, role: str) -> str:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def create_2fa_challenge(user_id: str) -> str:
+    expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+    payload = {"sub": user_id, "purpose": "2fa", "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
 def decode_access_token(token: str) -> dict:
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

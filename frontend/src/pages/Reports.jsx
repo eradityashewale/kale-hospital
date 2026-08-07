@@ -8,18 +8,39 @@ import Pill from '../components/Pill.jsx';
 import LineChart from '../components/charts/LineChart.jsx';
 import HBarChart from '../components/charts/HBarChart.jsx';
 
-const revenueTrend = [64, 82, 76, 91, 97, 118, 132];
-const revenueTrendLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug (proj.)'];
-
 export default function Reports() {
   const data = useData();
   const showToast = useToast();
   const [selectedDate, setSelectedDate] = useState(todayISO());
 
+  const revenueByMonth = useMemo(() => {
+    const totals = new Map();
+    data.bills.forEach((b) => {
+      if (!b.date) return;
+      const month = b.date.slice(0, 7);
+      totals.set(month, (totals.get(month) || 0) + b.amount);
+    });
+    return [...totals.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-6);
+  }, [data.bills]);
+
+  const revenueTrend = revenueByMonth.map(([, total]) => total);
+  const revenueTrendLabels = revenueByMonth.map(([month]) => {
+    const [y, m] = month.split('-');
+    return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString('en-IN', { month: 'short' });
+  });
+  const totalRevenue = data.bills.reduce((sum, b) => sum + b.amount, 0);
+
+  const bedStats = useMemo(() => {
+    const all = [];
+    data.bedBuildings.forEach((b) => b.floors.forEach((f) => f.beds.forEach((bed) => all.push(bed))));
+    const occupied = all.filter((b) => b.status === 'Occupied').length;
+    return { total: all.length, occupied, pct: all.length ? Math.round((occupied / all.length) * 100) : 0 };
+  }, [data.bedBuildings]);
+
   const reportCategories = [
     { title: 'Daily census', period: 'Today', value: `${data.patients.length} visits` },
-    { title: 'Revenue', period: 'Monthly', value: formatCurrency(revenueTrend.reduce((a, b) => a + b, 0) * 1000) },
-    { title: 'Bed occupancy', period: 'Current', value: '84%' },
+    { title: 'Revenue', period: 'All billed invoices', value: formatCurrency(totalRevenue) },
+    { title: 'Bed occupancy', period: `${bedStats.occupied}/${bedStats.total} beds`, value: `${bedStats.pct}%` },
     { title: 'Doctor productivity', period: 'This week', value: `${data.doctors.length} active doctors` },
   ];
 
@@ -84,7 +105,11 @@ export default function Reports() {
       <div className="grid-2">
         <article className="chart-card viz-root">
           <div className="card-head"><h3>Revenue report</h3></div>
-          <LineChart values={revenueTrend} labels={revenueTrendLabels} color="var(--series-1)" formatValue={(v) => `₹${v}K`} />
+          {revenueTrend.length ? (
+            <LineChart values={revenueTrend} labels={revenueTrendLabels} color="var(--series-1)" formatValue={(v) => formatCurrency(v)} />
+          ) : (
+            <div className="empty-state">No billed invoices yet.</div>
+          )}
         </article>
         <article className="chart-card viz-root">
           <div className="card-head"><h3>Department-wise patients</h3></div>
@@ -138,7 +163,7 @@ export default function Reports() {
       <div className="grid-2">
         <DataTable
           title="Doctor-wise report"
-          rows={data.doctors.map((d) => ({ ...d, patients: data.opdVisits.filter((v) => v.doctor === d.name).length + 5 }))}
+          rows={data.doctors.map((d) => ({ ...d, patients: data.opdVisits.filter((v) => v.doctor === d.name).length }))}
           rowKey="id"
           pageSize={6}
           columns={[

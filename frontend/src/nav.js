@@ -12,6 +12,7 @@ export const navigation = [
   { id: 'prescriptions', label: 'Prescriptions', icon: '💊', group: 'Clinical', roles: ['Doctor'] },
   { id: 'beds', label: 'Bed Management', icon: '🛌', group: 'Operations', roles: ['Super Admin', 'Admin', 'Nurse'] },
   { id: 'pharmacy', label: 'Pharmacy', icon: '💉', group: 'Operations', roles: ['Super Admin', 'Admin'] },
+  { id: 'vendors', label: 'Vendors', icon: '🚚', group: 'Operations', roles: ['Super Admin', 'Admin'] },
   { id: 'laboratory', label: 'Laboratory', icon: '🧪', group: 'Operations', roles: ['Super Admin', 'Admin', 'Doctor'] },
   { id: 'radiology', label: 'Radiology', icon: '🩻', group: 'Operations', roles: ['Super Admin', 'Admin', 'Doctor'] },
   { id: 'billing', label: 'Billing', icon: '💳', group: 'Operations', roles: ['Super Admin', 'Admin', 'Receptionist'] },

@@ -20,7 +20,17 @@ class User(Base):
     phone = Column(String, default="")
     department = Column(String, default="")
     ward = Column(String, default="")
+    totp_secret = Column(String, nullable=True)
+    totp_enabled = Column(Boolean, default=False)
+    reset_token = Column(String, nullable=True)
+    reset_token_expires = Column(String, nullable=True)
     created_at = Column(DateTime, default=utcnow)
+
+
+class Setting(Base):
+    __tablename__ = "settings"
+    key = Column(String, primary_key=True)
+    value = Column(Text, default="{}")
 
 
 class Department(Base):
@@ -29,6 +39,18 @@ class Department(Base):
     name = Column(String, nullable=False)
     head = Column(String, default="")
     created_at = Column(DateTime, default=utcnow)
+
+
+class Vendor(Base):
+    __tablename__ = "vendors"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    category = Column(String, default="Pharmacy")
+    contact_person = Column(String, default="")
+    phone = Column(String, default="")
+    email = Column(String, default="")
+    address = Column(String, default="")
+    status = Column(String, default="Active")
 
 
 class Doctor(Base):
@@ -155,6 +177,20 @@ class Appointment(Base):
     status = Column(String, default="Pending")
 
 
+class Referral(Base):
+    __tablename__ = "referrals"
+    id = Column(String, primary_key=True)
+    patient_id = Column(String, ForeignKey("patients.id"), nullable=False)
+    patient_name = Column(String, default="")
+    from_department = Column(String, default="")
+    to_department = Column(String, nullable=False)
+    doctor = Column(String, default="")
+    reason = Column(Text, default="")
+    status = Column(String, default="Pending")
+    date = Column(String, default="")
+    referred_by = Column(String, default="")
+
+
 class OpdVisit(Base):
     __tablename__ = "opd_visits"
     id = Column(String, primary_key=True)
@@ -239,6 +275,7 @@ class Medicine(Base):
     expiry = Column(String, default="")
     supplier = Column(String, default="")
     price = Column(Float, default=0)
+    reorder_level = Column(Integer, default=10)
 
 
 class LabTest(Base):
@@ -370,6 +407,7 @@ class BackupRecord(Base):
     date = Column(String, default="")
     size = Column(String, default="")
     status = Column(String, default="Completed")
+    file_name = Column(String, nullable=True)
 
 
 class Expense(Base):

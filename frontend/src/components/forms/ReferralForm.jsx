@@ -1,20 +1,30 @@
+import { apiFetch } from '../../api.js';
 import { useData } from '../../context/DataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { validateForm } from '../../utils.js';
 import FormField from '../FormField.jsx';
 
 export default function ReferralForm({ close }) {
-  const { patients, departments } = useData();
+  const { patients, departments, refresh } = useData();
   const showToast = useToast();
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     if (!validateForm(form)) { showToast('Please complete the required fields.', 'error'); return; }
     const data = new FormData(form);
     const patient = patients.find((p) => p.id === data.get('patientId'));
-    showToast(`${patient?.name || 'Patient'} referred to ${data.get('department')}.`, 'success');
-    close();
+    try {
+      await apiFetch('/referrals', {
+        method: 'POST',
+        body: JSON.stringify({ patientId: data.get('patientId'), department: data.get('department'), reason: data.get('reason') }),
+      });
+      showToast(`${patient?.name || 'Patient'} referred to ${data.get('department')}.`, 'success');
+      close();
+      await refresh();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   };
 
   return (

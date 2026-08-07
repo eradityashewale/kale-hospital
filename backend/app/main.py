@@ -25,12 +25,25 @@ from .routers import (
     opd,
     patients,
     pharmacy,
+    referrals,
     roles,
+    settings,
     staff,
     users,
+    vendors,
 )
 
 Base.metadata.create_all(bind=engine)
+
+
+def _add_column_if_missing(inspector, table: str, column: str, ddl: str) -> None:
+    if table not in inspector.get_table_names():
+        return
+    cols = [col["name"] for col in inspector.get_columns(table)]
+    if column not in cols:
+        with engine.connect() as conn:
+            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {ddl}"))
+            conn.commit()
 
 
 def _migrate_schema() -> None:
@@ -38,13 +51,13 @@ def _migrate_schema() -> None:
     # columns on tables that already existed before a model change. Uses the
     # SQLAlchemy inspector so this works on both SQLite and Postgres.
     inspector = inspect(engine)
-    if "attendance" not in inspector.get_table_names():
-        return
-    cols = [col["name"] for col in inspector.get_columns("attendance")]
-    if "shift" not in cols:
-        with engine.connect() as conn:
-            conn.execute(text("ALTER TABLE attendance ADD COLUMN shift VARCHAR DEFAULT ''"))
-            conn.commit()
+    _add_column_if_missing(inspector, "attendance", "shift", "shift VARCHAR DEFAULT ''")
+    _add_column_if_missing(inspector, "medicines", "reorder_level", "reorder_level INTEGER DEFAULT 10")
+    _add_column_if_missing(inspector, "backup_records", "file_name", "file_name VARCHAR")
+    _add_column_if_missing(inspector, "users", "totp_secret", "totp_secret VARCHAR")
+    _add_column_if_missing(inspector, "users", "totp_enabled", "totp_enabled BOOLEAN DEFAULT FALSE")
+    _add_column_if_missing(inspector, "users", "reset_token", "reset_token VARCHAR")
+    _add_column_if_missing(inspector, "users", "reset_token_expires", "reset_token_expires VARCHAR")
 
 
 _migrate_schema()
@@ -77,7 +90,7 @@ def health():
 for router in (
     auth.router, bootstrap.router, patients.router, appointments.router, opd.router, ipd.router,
     beds.router, pharmacy.router, lab_radiology.router, billing.router, emergency.router,
-    departments.router, staff.router, leave.router, expenses.router, users.router, roles.router,
-    notifications.router, audit_logs.router, backup.router,
+    departments.router, staff.router, leave.router, expenses.router, referrals.router, vendors.router, users.router, roles.router,
+    notifications.router, audit_logs.router, backup.router, settings.router,
 ):
     app.include_router(router)

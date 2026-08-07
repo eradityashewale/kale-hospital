@@ -20,6 +20,30 @@ class MedicineCreate(BaseModel):
     expiry: str = ""
     supplier: str = ""
     price: float = 0
+    reorder_level: int = 10
+
+
+def _maybe_notify_low_stock(db: Session, medicine: models.Medicine) -> None:
+    if medicine.stock > medicine.reorder_level:
+        return
+    existing = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.type == "System",
+            models.Notification.message.contains(medicine.name),
+            models.Notification.message.contains("stock is low"),
+            models.Notification.read.is_(False),
+        )
+        .first()
+    )
+    if existing:
+        return
+    db.add(models.Notification(
+        id=new_id("N"), type="System",
+        message=f"{medicine.name} stock is low ({medicine.stock} {medicine.unit} left, reorder level {medicine.reorder_level}).",
+        recipient="Pharmacy team", status="Sent", time="Just now", read=False,
+    ))
+    db.commit()
 
 
 @router.get("")
@@ -33,6 +57,7 @@ def add_medicine(payload: MedicineCreate, user: models.User = Depends(get_curren
     db.add(medicine)
     db.commit()
     log_audit(db, user.name, f"Added medicine {medicine.name}", "Pharmacy")
+    _maybe_notify_low_stock(db, medicine)
     return medicine_dict(medicine)
 
 
@@ -46,4 +71,5 @@ def issue_medicine(medicine_id: str, user: models.User = Depends(get_current_use
     medicine.stock -= 1
     db.commit()
     log_audit(db, user.name, f"Issued medicine {medicine.name}", "Pharmacy")
+    _maybe_notify_low_stock(db, medicine)
     return medicine_dict(medicine)

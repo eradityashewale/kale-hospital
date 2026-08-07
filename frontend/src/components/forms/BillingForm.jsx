@@ -14,7 +14,8 @@ function computeTotal(data) {
 }
 
 export default function BillingForm({ close, presetPatientId }) {
-  const { patients, refresh } = useData();
+  const { patients, settings, refresh } = useData();
+  const defaultFee = settings.opd?.opdFee ?? 500;
   const showToast = useToast();
   const [total, setTotal] = useState(0);
 
@@ -49,7 +50,7 @@ export default function BillingForm({ close, presetPatientId }) {
       <div className="form-grid">
         <FormField label="Patient" name="patientId" type="select" required defaultValue={presetPatientId} options={patients.map((p) => ({ value: p.id, label: `${p.name} (${p.id})` }))} />
         <FormField label="Payment mode" name="mode" type="select" options={['Cash', 'Card', 'Online', 'Insurance']} />
-        <FormField label="Consultation charges (₹)" name="consultation" type="number" defaultValue="500" />
+        <FormField label="Consultation charges (₹)" name="consultation" type="number" defaultValue={defaultFee} />
         <FormField label="Admission / room charges (₹)" name="room" type="number" defaultValue="0" />
         <FormField label="Operation charges (₹)" name="operation" type="number" defaultValue="0" />
         <FormField label="Medicine charges (₹)" name="medicine" type="number" defaultValue="0" />

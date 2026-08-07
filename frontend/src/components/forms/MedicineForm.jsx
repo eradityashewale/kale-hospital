@@ -19,6 +19,7 @@ export default function MedicineForm({ close }) {
         body: JSON.stringify({
           name: data.get('name'), category: data.get('category'), stock: Number(data.get('stock')) || 0,
           unit: data.get('unit') || 'units', expiry: data.get('expiry'), supplier: data.get('supplier'), price: Number(data.get('price')) || 0,
+          reorder_level: Number(data.get('reorder_level')) || 10,
         }),
       });
       showToast(`${data.get('name')} added to inventory.`, 'success');
@@ -39,6 +40,7 @@ export default function MedicineForm({ close }) {
         <FormField label="Expiry date" name="expiry" type="date" required />
         <FormField label="Supplier" name="supplier" required />
         <FormField label="Price (₹)" name="price" type="number" required defaultValue="50" />
+        <FormField label="Reorder level" name="reorder_level" type="number" defaultValue="10" hint="Alert is raised when stock falls to or below this level" />
       </div>
       <div className="modal-footer">
         <button className="ghost-btn" type="button" onClick={close}>Cancel</button>

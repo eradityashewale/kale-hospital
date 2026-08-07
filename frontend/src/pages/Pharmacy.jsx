@@ -13,7 +13,7 @@ function isExpiringSoon(dateStr) {
 }
 
 function medicineStatus(med) {
-  if (med.stock <= 10) return 'Low';
+  if (med.stock <= med.reorderLevel) return 'Low';
   if (isExpiringSoon(med.expiry)) return 'Expiring Soon';
   return 'Healthy';
 }
@@ -58,6 +58,7 @@ export default function Pharmacy() {
           { key: 'name', label: 'Medicine' },
           { key: 'category', label: 'Category' },
           { key: 'stock', label: 'Stock', render: (r) => `${r.stock} ${r.unit}` },
+          { key: 'reorderLevel', label: 'Reorder at' },
           { key: 'expiry', label: 'Expiry', render: (r) => formatDate(r.expiry) },
           { key: 'supplier', label: 'Supplier' },
           { key: 'price', label: 'Price', render: (r) => formatCurrency(r.price) },

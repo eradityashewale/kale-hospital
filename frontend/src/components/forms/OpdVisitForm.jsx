@@ -5,9 +5,10 @@ import { validateForm, addDaysISO, todayISO } from '../../utils.js';
 import FormField from '../FormField.jsx';
 
 export default function OpdVisitForm({ close, presetPatientId }) {
-  const { patients, departments, doctors, refresh } = useData();
+  const { patients, departments, doctors, settings, refresh } = useData();
   const showToast = useToast();
   const preselect = presetPatientId ? patients.find((p) => p.id === presetPatientId) : null;
+  const defaultFee = settings.opd?.opdFee ?? 500;
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ export default function OpdVisitForm({ close, presetPatientId }) {
         <FormField label="Patient" name="patientId" type="select" required defaultValue={preselect?.id} options={patients.map((p) => ({ value: p.id, label: `${p.name} (${p.id})` }))} />
         <FormField label="Department" name="department" type="select" required defaultValue={preselect?.department} options={departments.map((d) => d.name)} />
         <FormField label="Doctor" name="doctor" type="select" required defaultValue={preselect?.doctor} options={doctors.map((d) => d.name)} />
-        <FormField label="Consultation fee (₹)" name="fee" type="number" required defaultValue="500" />
+        <FormField label="Consultation fee (₹)" name="fee" type="number" required defaultValue={defaultFee} />
         <FormField label="Follow-up date" name="followUp" type="date" defaultValue={addDaysISO(14)} />
         <FormField label="Symptoms" name="symptoms" type="textarea" rows={2} full required />
         <FormField label="Diagnosis" name="diagnosis" type="textarea" rows={2} full required />

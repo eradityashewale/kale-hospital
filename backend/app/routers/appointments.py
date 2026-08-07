@@ -35,6 +35,20 @@ def _next_token(db: Session) -> str:
     return f"T-{(max(nums) + 1 if nums else 1):02d}"
 
 
+def _doctor_on_leave(db: Session, doctor_name: str, date: str) -> bool:
+    return (
+        db.query(models.LeaveRequest)
+        .filter(
+            models.LeaveRequest.requester_name == doctor_name,
+            models.LeaveRequest.status == "Approved",
+            models.LeaveRequest.start_date <= date,
+            models.LeaveRequest.end_date >= date,
+        )
+        .first()
+        is not None
+    )
+
+
 @router.get("")
 def list_appointments(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return [appointment_dict(a) for a in db.query(models.Appointment).order_by(models.Appointment.id.desc()).all()]
@@ -45,6 +59,8 @@ def book_appointment(payload: AppointmentCreate, user: models.User = Depends(get
     patient = db.query(models.Patient).filter(models.Patient.id == payload.patientId).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
+    if payload.doctor and _doctor_on_leave(db, payload.doctor, payload.date):
+        raise HTTPException(status_code=400, detail=f"{payload.doctor} is on approved leave on {payload.date}")
     appt = models.Appointment(
         id=new_id("APT"), patient_id=patient.id, patient_name=patient.name, department=payload.department,
         doctor=payload.doctor, date=payload.date, time=payload.time, token=_next_token(db), status="Pending",
